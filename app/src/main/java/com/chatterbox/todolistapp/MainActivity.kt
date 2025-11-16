@@ -13,6 +13,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.chatterbox.todolistapp.ui.theme.TodoListAppTheme
 
+/*
+* todo: make display for the list
+*       •make a card for each list
+*       •the cards should have a button to delete and a checkbox
+*       •make a lazy column to display the cards
+* todo: make a button to add a new list
+*       •top right there should be a "+" button
+*       •this will display a pop up with a text field to add a new list
+*       •the should be an add button and a cancel button
+* todo: logic
+*       •there should be a text list that would be mutable
+*       •there should be a button to add a new item
+*       •there should be a button to delete a item
+*       •there should be a button that ticks an item: if item is done, the button should be ticked
+* */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
