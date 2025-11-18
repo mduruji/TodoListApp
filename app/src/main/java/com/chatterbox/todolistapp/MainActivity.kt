@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +54,9 @@ class MainActivity : ComponentActivity() {
                         contentPadding = innerPadding,
                         modifier = Modifier.fillMaxSize(),
                         content = {
-
+                            item {
+                                ItemCard(text = "test")
+                            }
                         }
                     )
                 }
@@ -59,9 +65,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/*
-* todo: make icons for delete and done
-* */
 @Composable
 fun ItemCard(text: String, modifier: Modifier = Modifier) {
     var done by remember { mutableStateOf(false) }
@@ -72,11 +75,17 @@ fun ItemCard(text: String, modifier: Modifier = Modifier) {
             Box(modifier = Modifier.weight(1f)) {
                 Text(text = textValue)
             }
-            Box(modifier = Modifier.padding(4.dp)) {
-                Text(text = "delete")
+            Box(modifier = Modifier.padding(5.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Home"
+                )
             }
-            Box(modifier = Modifier.padding(4.dp)) {
-                Text(text = "done")
+            Box(modifier = Modifier.padding(5.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Home"
+                )
             }
         }
     }
