@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -36,6 +37,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.chatterbox.todolistapp.ui.theme.TodoListAppTheme
 
 /*
@@ -63,6 +67,20 @@ import com.chatterbox.todolistapp.ui.theme.TodoListAppTheme
 *       •there should be a button that ticks an item: if item is done, the button should be ticked
 * */
 
+
+class TodoList : ViewModel() {
+    val items = mutableStateListOf<String>()
+
+    fun addItem(item: String) {
+        if (item.isNotBlank() && !items.contains(item)) {
+            items.add(item)
+        }
+    }
+
+    fun removeItem(item: String) {
+        items.remove(item)
+    }
+}
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,11 +88,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TodoListAppTheme {
+                var textInput by remember { mutableStateOf("") }
                 var showDialog by remember { mutableStateOf(false) }
+                val todoListViewModel = remember { TodoList() }
 
                 if (showDialog) {
                     AlertDialog(
-                        onDismissRequest = { showDialog = false },
+                        onDismissRequest = {
+                            showDialog = false
+                            textInput = ""
+                        },
                         title = {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -83,7 +106,10 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 Text(text = "Add New Item")
 
-                                IconButton(onClick = { showDialog = false }) {
+                                IconButton(onClick = {
+                                    showDialog = false
+                                    textInput = ""
+                                }) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "Close"
@@ -92,19 +118,23 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         text = {
-                            var text by remember { mutableStateOf("") }
-
                             Text("Enter your text:")
                             Spacer(modifier = Modifier.height(8.dp))
 
                             TextField(
-                                value = text,
-                                onValueChange = { text = it },
+                                value = textInput,
+                                onValueChange = {
+                                    textInput = it
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
                         confirmButton = {
-                            Button(onClick = { showDialog = false }) {
+                            Button(onClick = {
+                                showDialog = false
+                                todoListViewModel.addItem(textInput)
+                                textInput = ""
+                            }) {
                                 Text("Add")
                             }
                         }
@@ -139,7 +169,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
-                    ListDisplay(modifier = Modifier.padding(innerPadding))
+                    ListDisplay(
+                        modifier = Modifier.padding(innerPadding),
+                        todoList = todoListViewModel
+                    )
                 }
             }
         }
@@ -147,8 +180,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ItemCard(text: String, modifier: Modifier = Modifier) {
-    var done by remember { mutableStateOf(false) }
+fun ItemCard(
+    text: String,
+    modifier: Modifier = Modifier,
+    onDelete: () -> Unit
+) {
     var textValue by remember { mutableStateOf(text) }
 
     Card(modifier = modifier.fillMaxWidth().padding(8.dp)) {
@@ -156,13 +192,23 @@ fun ItemCard(text: String, modifier: Modifier = Modifier) {
             Box(modifier = Modifier.weight(1f)) {
                 Text(text = textValue)
             }
-            Box(modifier = Modifier.padding(5.dp)) {
+            IconButton(
+                modifier = Modifier.padding(5.dp),
+                onClick = {
+                    onDelete()
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Home"
                 )
             }
-            Box(modifier = Modifier.padding(5.dp)) {
+            IconButton(
+                modifier = Modifier.padding(5.dp),
+                onClick = {
+                    onDelete()
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Home"
@@ -173,14 +219,30 @@ fun ItemCard(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ListDisplay(modifier: Modifier = Modifier) {
-    val todoList = remember { mutableListOf(mutableListOf<String>()) }
+fun ListDisplay(
+    modifier: Modifier = Modifier,
+    todoList: TodoList
+) {
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         content = {
-            items(todoList.size) { index ->
-                ItemCard(text = todoList[index].toString())
+            if (todoList.items.isEmpty()) {
+                item {
+                    Text("Add a something to the list")
+                }
+            } else {
+                items(
+                    todoList.items,
+                    key = { item -> item }
+                ) { item ->
+                    ItemCard(
+                        text = item,
+                        onDelete = {
+                            todoList.removeItem(item)
+                        }
+                    )
+                }
             }
         }
     )
@@ -190,6 +252,6 @@ fun ListDisplay(modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     TodoListAppTheme {
-        ItemCard(text = "test")
+        ListDisplay(todoList = TodoList())
     }
 }
