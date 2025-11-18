@@ -82,6 +82,11 @@ fun ItemCard(text: String, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun ListDisplay(modifier: Modifier = Modifier) {
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
