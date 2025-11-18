@@ -81,6 +81,7 @@ class TodoList : ViewModel() {
         items.remove(item)
     }
 }
+
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
