@@ -188,7 +188,7 @@ fun ItemCard(
 ) {
     var textValue by remember { mutableStateOf(text) }
 
-    Card(modifier = modifier.fillMaxWidth().padding(8.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         Row(modifier = Modifier.padding(16.dp)) {
             Box(modifier = Modifier.weight(1f)) {
                 Text(text = textValue)
